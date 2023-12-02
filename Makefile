@@ -10,6 +10,7 @@ ccflags-y += -DDRIVER_NAME=\"$(obj-m:.o=)\"
 
 all:
 	$(MAKE) -C $(KERNEL_HEADERS) M=$(PWD) modules
+	-modinfo ./*.ko
 clean:
 	$(MAKE) -C $(KERNEL_HEADERS) M=$(PWD) clean
 
