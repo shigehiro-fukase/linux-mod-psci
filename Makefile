@@ -3,7 +3,7 @@ KERNEL_HEADERS=/usr/src/linux-headers-$(shell uname -r)
 
 CFILES = driver.c
 obj-m := psci-kick.o
-psci-kick-objs := $(CFILES:.c=.o)
+$(obj-m:.o=-objs) := $(CFILES:.c=.o)
 
 ccflags-y += -std=gnu99 -Wall -Wno-declaration-after-statement
 ccflags-y += -DDRIVER_NAME=\"$(obj-m:.o=)\"
