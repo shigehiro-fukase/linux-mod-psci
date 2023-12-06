@@ -57,11 +57,11 @@ MODULE_LICENSE("Dual BSD/GPL");
 
 static bool use_hvc = false;
 module_param(use_hvc, bool, S_IRUGO);
-MODULE_PARM_DESC(use_hvc, "use HVC (default off = use SMC)");
+MODULE_PARM_DESC(use_hvc, "Select SMC/HVC N:SMC(default) Y:HVC");
 
 static bool use_asm = false;
 module_param(use_asm, bool, S_IRUGO);
-MODULE_PARM_DESC(use_asm, "use ASM (default off = use Linux API)");
+MODULE_PARM_DESC(use_asm, "Select API/ASM N:Linux-API(default) Y:ASM");
 
 
 static bool verbose = false;
