@@ -59,6 +59,10 @@ static bool use_hvc = false;
 module_param(use_hvc, bool, S_IRUGO);
 MODULE_PARM_DESC(use_hvc, "use HVC (default off = use SMC)");
 
+static bool use_asm = false;
+module_param(use_asm, bool, S_IRUGO);
+MODULE_PARM_DESC(use_asm, "use ASM (default off = use Linux API)");
+
 
 static bool verbose = false;
 module_param(verbose, bool, S_IRUGO);
@@ -94,12 +98,71 @@ invoke_psci_fn_smc(unsigned long function_id,
 	arm_smccc_smc(function_id, arg0, arg1, arg2, 0, 0, 0, 0, &res);
 	return res.a0;
 }
+/*
+ * void smc_call(arg0, arg1...arg7)
+ * issue the secure monitor call
+ * x0~x7: input arguments
+ * x0~x3: output arguments
+ */
+struct call_regs {
+	unsigned long regs[7];
+};
+static void hvc_call(struct call_regs *args) {
+	asm volatile(
+			"ldr x0, %0\n" /* <--- Function ID */
+			"ldr x1, %1\n" /* <--- Input parameters */
+			"ldr x2, %2\n"
+			"ldr x3, %3\n"
+			"ldr x4, %4\n"
+			"ldr x5, %5\n"
+			"ldr x6, %6\n"
+			"hvc     #0\n" /* <--- SMC call (or hvc for HVC) */
+			"str x0, %0\n" /* <--- Results */
+			"str x1, %1\n"
+			"str x2, %2\n"
+			"str x3, %3\n"
+			: "+m" (args->regs[0]), "+m" (args->regs[1]), "+m" (args->regs[2]), "+m" (args->regs[3])
+			: "m" (args->regs[4]), "m" (args->regs[5]), "m" (args->regs[6])
+			: "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7",
+			"x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15",
+			"x16", "x17");
+}
+static void smc_call(struct call_regs *args) {
+	asm volatile(
+			"ldr x0, %0\n" /* <--- Function ID */
+			"ldr x1, %1\n" /* <--- Input parameters */
+			"ldr x2, %2\n"
+			"ldr x3, %3\n"
+			"ldr x4, %4\n"
+			"ldr x5, %5\n"
+			"ldr x6, %6\n"
+			"smc     #0\n" /* <--- SMC call (or hvc for HVC) */
+			"str x0, %0\n" /* <--- Results */
+			"str x1, %1\n"
+			"str x2, %2\n"
+			"str x3, %3\n"
+			: "+m" (args->regs[0]), "+m" (args->regs[1]), "+m" (args->regs[2]), "+m" (args->regs[3])
+			: "m" (args->regs[4]), "m" (args->regs[5]), "m" (args->regs[6])
+			: "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7",
+			"x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15",
+			"x16", "x17");
+}
 static unsigned long invoke_psci_fn(unsigned long function_id,
 		unsigned long arg0, unsigned long arg1, unsigned long arg2) {
-	if (use_hvc) {
-		return invoke_psci_fn_hvc(function_id, arg0, arg1, arg2);
+	if (!use_asm) {
+		if (use_hvc) {
+			return invoke_psci_fn_hvc(function_id, arg0, arg1, arg2);
+		} else {
+			return invoke_psci_fn_smc(function_id, arg0, arg1, arg2);
+		}
 	} else {
-		return invoke_psci_fn_smc(function_id, arg0, arg1, arg2);
+		struct call_regs args = { .regs = { function_id, arg0, arg1, arg2, 0, 0, 0 } };
+		if (use_hvc) {
+			hvc_call(&args);
+		} else {
+			smc_call(&args);
+		}
+		return args.regs[0];
 	}
 }
 static void print_psci_retval(unsigned long retval) {
