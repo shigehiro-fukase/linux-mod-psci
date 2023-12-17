@@ -191,7 +191,7 @@ static unsigned long psci_cpu_on(unsigned long fn, unsigned long cpuid, unsigned
 
 
 static void print_settings(void) {
-	printk(DRIVER_NAME ": func_id=%lu arg0=%lu arg1=%lu arg2=%lu\n", function_id, arg0, arg1, arg2);
+	printk(DRIVER_NAME ": func_id=0x%lX arg0=%lu arg1=%lu arg2=%lu\n", function_id, arg0, arg1, arg2);
 }
 
 
