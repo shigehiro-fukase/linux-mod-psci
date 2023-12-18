@@ -74,7 +74,7 @@ MODULE_PARM_DESC(function_id, "arm smccc a0");
 static unsigned long arg0 = 3;
 module_param(arg0, ulong, S_IRUGO);
 MODULE_PARM_DESC(arg0, "arm smccc a1");
-static unsigned long arg1 = 0;
+static unsigned long arg1 = 0x380000000;
 module_param(arg1, ulong, S_IRUGO);
 MODULE_PARM_DESC(arg1, "arm smccc a2");
 static unsigned long arg2 = 0;
