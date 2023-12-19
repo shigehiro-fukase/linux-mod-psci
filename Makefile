@@ -1,5 +1,8 @@
 # KERNEL_HEADERS=/lib/modules/$(shell uname -r)/build
-KERNEL_HEADERS=/usr/src/linux-headers-$(shell uname -r)
+# KERNEL_HEADERS=/usr/src/linux-headers-$(shell uname -r)
+# KERNEL_HEADERS=/home/kmc/work/rz_v2l/linux/kernel-source
+# KERNEL_HEADERS=/home/kmc/work/rz_v2l/linux/build
+KERNEL_HEADERS=/home/kmc/work/rz_v2l/linux/build.f1
 
 CFILES = driver.c
 obj-m := psci-kick.o
