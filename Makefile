@@ -12,6 +12,19 @@ $(obj-m:.o=-objs) := $(CFILES:.c=.o)
 ccflags-y += -std=gnu99 -Wall -Wno-declaration-after-statement
 ccflags-y += -DDRIVER_NAME=\"$(obj-m:.o=)\"
 
+LDF		= ../../linux-load-file/ldf.elf
+LDKO		= ../../linux-load-module/ldko.elf
+LOOP64		= ../../arm64-loop/loop64.img 
+#BOOTADDR	= 0x380000000	# RZ/T2
+
+# R-CarH3 test1
+#BOOTADDR	= 0x60000000
+#BOOTCPU	= 3	# Clulster 0 Core 3
+
+# R-CarH3 test2
+BOOTADDR	= 0x730000000
+BOOTCPU		= 0x100	# Clulster 1 Core 0
+
 all:
 	$(MAKE) -C $(KERNEL_HEADERS) M=$(PWD) modules
 	-modinfo ./*.ko
@@ -28,8 +41,8 @@ insmod: rmmod
 	sudo insmod $(obj-m:.o=.ko) \
 		use_hvc=N \
 		use_asm=N \
-		arg0=3 \
-		arg1=0x60000000 \
+		arg0=$(BOOTCPU) \
+		arg1=$(BOOTADDR) \
 		arg2=0 \
 		verbose=Y
 	sudo dmesg | tail
@@ -39,32 +52,20 @@ test:
 	@echo insmod $(obj-m:.o=.ko) \
 		use_hvc=N \
 		use_asm=N \
-		arg0=3 \
-		arg1=0x60000000 \
+		arg0=$(BOOTCPU) \
+		arg1=$(BOOTADDR) \
 		arg2=0 \
 		verbose=Y
 
-test_h3_1:
-	@echo ../linux-load-file/ldf.elf 0x60000000 ../../arm64-loop/loop64.img 
-	@echo ../linux-load-module/ldko.elf \
+h3:
+	@echo $(LDF) $(BOOTADDR) $(LOOP64)
+	@echo $(LDKO) \
 		--init_module \
 		$(obj-m:.o=.ko) \
 		use_hvc=N \
 		use_asm=N \
-		arg0=3 \
-		arg1=0x60000000 \
-		arg2=0 \
-		verbose=Y
-
-test_h3_2:
-	@echo ../linux-load-file/ldf.elf 0x730000000 ../../arm64-loop/loop64.img 
-	@echo ../linux-load-module/ldko.elf \
-		--init_module \
-		$(obj-m:.o=.ko) \
-		use_hvc=N \
-		use_asm=N \
-		arg0=0x100 \
-		arg1=0x730000000 \
+		arg0=$(BOOTCPU) \
+		arg1=$(BOOTADDR) \
 		arg2=0 \
 		verbose=Y
 
