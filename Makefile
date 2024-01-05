@@ -6,7 +6,7 @@
 KERNEL_HEADERS=/home/kmc/work/h3/linux/build
 
 CFILES = driver.c
-obj-m := psci-procfs.o
+obj-m := mod-psci.o
 $(obj-m:.o=-objs) := $(CFILES:.c=.o)
 obj-mm := $(subst -,_,$(obj-m:.o=))
 obj-ko := $(obj-m:.o=.ko)
