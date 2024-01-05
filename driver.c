@@ -178,7 +178,7 @@ static int parse_line(char * buf, char* av[], int avsz) {
 		} else if (strncmp(s, "address=", strlen("address=")) == 0) {
 			char *p = s + strlen("address=");
 			ret = kstrtoul(p, 0, &arg1);
-			printk(DRIVER_NAME ": %s core=%ld ret=%d\n", __func__, cluster, ret);
+			printk(DRIVER_NAME ": %s address=0x%lX ret=%d\n", __func__, arg1, ret);
 			has_arg1 = 1;
 		} else if (has_arg0 == 0) {
 			ret = kstrtoul(s, 0, &arg0);
