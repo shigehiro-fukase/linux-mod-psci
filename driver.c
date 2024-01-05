@@ -26,7 +26,7 @@
 
 MODULE_LICENSE("Dual BSD/GPL");
 #ifndef DRIVER_NAME
-#define DRIVER_NAME	"psci-procfs"	/* /proc/devices, /proc/modules */
+#define DRIVER_NAME	"mod-psci"	/* /proc/devices, /proc/modules */
 #endif /* DRIVER_NAME */
 #ifndef PROC_NAME
 #define PROC_NAME	"psciop"	/* procfs name of /proc/ */
@@ -71,10 +71,10 @@ static unsigned long entrypoint = 0;
 module_param(entrypoint, ulong, S_IRUGO);
 MODULE_PARM_DESC(entrypoint, "entrypoint");
 
-static unsigned long arg0 = 3;
+static unsigned long arg0 = 0;
 module_param(arg0, ulong, S_IRUGO);
 MODULE_PARM_DESC(arg0, "arm smccc arg0");
-static unsigned long arg1 = 0x380000000;
+static unsigned long arg1 = 0;
 module_param(arg1, ulong, S_IRUGO);
 MODULE_PARM_DESC(arg1, "arm smccc arg1");
 static unsigned long arg2 = 0;
@@ -139,7 +139,7 @@ static int parse_line(char * buf, char* av[], int avsz) {
 				cmd = PSCI_CMD_CPU_OFF;
 			} else if ((strcasecmp(s, "cpu_on") == 0) || (strcasecmp(s, "on") == 0)) {
 				cmd = PSCI_CMD_CPU_ON;
-			} else if ((strcasecmp(s, "adffinity_info") == 0) || (strcasecmp(s, "affinity") == 0)) {
+			} else if ((strcasecmp(s, "affinity_info") == 0) || (strcasecmp(s, "affinity") == 0)) {
 				cmd = PSCI_CMD_AFFINITY_INFO;
 			} else if (strcasecmp(s, "migrate") == 0) {
 				cmd = PSCI_CMD_MIGRATE;
