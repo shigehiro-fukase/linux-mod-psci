@@ -29,7 +29,7 @@ MODULE_LICENSE("Dual BSD/GPL");
 #define DRIVER_NAME	"mod-psci"	/* /proc/devices, /proc/modules */
 #endif /* DRIVER_NAME */
 #ifndef PROC_NAME
-#define PROC_NAME	"psciop"	/* procfs name of /proc/ */
+#define PROC_NAME	"psci"		/* procfs name of /proc/ */
 #endif /* PROC_NAME */
 
 /* default value */
@@ -85,19 +85,34 @@ static int __init mod_init(void);
 static void __exit mod_exit(void);
 
 
+unsigned long psci_cmd2id(unsigned long cmd) {
+	unsigned long function_id;
+
+	if (psci_cmd < (sizeof(psci_function_id)/sizeof(psci_function_id[0]))) {
+		function_id = psci_function_id[psci_cmd];
+	} else {
+		function_id = psci_cmd;
+	}
+	return function_id;
+}
 static void print_settings(void) {
-	unsigned long function_id = psci_function_id[psci_cmd];
+	unsigned long function_id = psci_cmd2id(psci_cmd);
 	printk(DRIVER_NAME ": func(%lu) id=0x%lX arg0=0x%lX arg1=0x%lX arg2=0x%lX\n", psci_cmd, function_id, arg0, arg1, arg2);
 }
 static int psci_invoke(void) {
 	unsigned long psci_ret;
-	unsigned long function_id = psci_function_id[psci_cmd];
+	unsigned long function_id = psci_cmd2id(psci_cmd);
 
 	struct arm_smccc_res res;
 	psci_ret = invoke_psci_fn(use_hvc, use_asm,
 			function_id, arg0, arg1, arg2,
 			&res);
-	print_psci_retval(psci_ret);
+
+	if (function_id == PSCI_FN_PSCI_VERSION) {
+		printk(DRIVER_NAME ": value 0x%lx\n", psci_ret);
+	} else {
+		print_psci_retval(psci_ret);
+	}
 	print_psci_res(&res);
 	return psci_ret;
 }
@@ -125,16 +140,16 @@ static int parse_line(char * buf, char* av[], int avsz) {
 	int has_arg0 = 0;
 	int has_arg1 = 0;
 	int has_arg2 = 0;
-	printk(DRIVER_NAME ": %s line='%s'\n", __func__, buf);
+	// printk(DRIVER_NAME ": %s line='%s'\n", __func__, buf);
 	ac = strsplit(buf, av, avsz);
 	for (i=0; i<ac; i++) {
 		char* s = av[i];
 		if (!s) break;
-		printk(DRIVER_NAME ": %s av[%d]='%s'\n", __func__, i, s);
+		// printk(DRIVER_NAME ": %s av[%d]='%s'\n", __func__, i, s);
 		if (i==0) { // function
 			if (is0_9(*s)) {
 				ret = kstrtoul(s, 0, &cmd);
-				printk(DRIVER_NAME ": %s cmd=%ld ret=%d\n", __func__, cmd, ret);
+				// printk(DRIVER_NAME ": %s cmd=%ld ret=%d\n", __func__, cmd, ret);
 			} else if ((strcasecmp(s, "version") == 0) || (strcasecmp(s, "ver") == 0)) {
 				cmd = PSCI_CMD_PSCI_VERSION;
 			} else if ((strcasecmp(s, "cpu_suspend") == 0) || (strcasecmp(s, "suspend") == 0) || (strcasecmp(s, "sus") == 0)) {
@@ -166,31 +181,31 @@ static int parse_line(char * buf, char* av[], int avsz) {
 		} else if (strncmp(s, "cluster=", strlen("cluster=")) == 0) {
 			char *p = s + strlen("cluster=");
 			ret = kstrtoul(p, 0, &cluster);
-			printk(DRIVER_NAME ": %s cluster=%ld ret=%d\n", __func__, cluster, ret);
+			// printk(DRIVER_NAME ": %s cluster=%ld ret=%d\n", __func__, cluster, ret);
 			arg0 = ((cluster & 0xFF) << 8) | ((core & 0xFF) << 0);
 			has_arg0 = 1;
 		} else if (strncmp(s, "core=", strlen("core=")) == 0) {
 			char *p = s + strlen("core=");
 			ret = kstrtoul(p, 0, &cluster);
-			printk(DRIVER_NAME ": %s core=%ld ret=%d\n", __func__, cluster, ret);
+			// printk(DRIVER_NAME ": %s core=%ld ret=%d\n", __func__, cluster, ret);
 			arg0 = ((cluster & 0xFF) << 8) | ((core & 0xFF) << 0);
 			has_arg0 = 1;
 		} else if (strncmp(s, "address=", strlen("address=")) == 0) {
 			char *p = s + strlen("address=");
 			ret = kstrtoul(p, 0, &arg1);
-			printk(DRIVER_NAME ": %s address=0x%lX ret=%d\n", __func__, arg1, ret);
+			// printk(DRIVER_NAME ": %s address=0x%lX ret=%d\n", __func__, arg1, ret);
 			has_arg1 = 1;
 		} else if (has_arg0 == 0) {
 			ret = kstrtoul(s, 0, &arg0);
-			printk(DRIVER_NAME ": %s arg0=%ld ret=%d\n", __func__, arg0, ret);
+			// printk(DRIVER_NAME ": %s arg0=%ld ret=%d\n", __func__, arg0, ret);
 			has_arg0 = 1;
 		} else if (has_arg1 == 0) {
 			ret = kstrtoul(s, 0, &arg1);
-			printk(DRIVER_NAME ": %s arg1=%ld ret=%d\n", __func__, arg1, ret);
+			// printk(DRIVER_NAME ": %s arg1=%ld ret=%d\n", __func__, arg1, ret);
 			has_arg1 = 1;
 		} else if (has_arg2 == 0) {
 			ret = kstrtoul(s, 0, &arg2);
-			printk(DRIVER_NAME ": %s arg2=%ld ret=%d\n", __func__, arg2, ret);
+			// printk(DRIVER_NAME ": %s arg2=%ld ret=%d\n", __func__, arg2, ret);
 			has_arg2 = 1;
 		} else {
 			printk(DRIVER_NAME ": %s BAD argument[%d], index overflow.\n", __func__, i);
