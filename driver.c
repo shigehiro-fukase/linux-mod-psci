@@ -122,18 +122,22 @@ static int parse_line(char * buf, char* av[], int avsz) {
 	unsigned long cmd = psci_cmd;
 	unsigned long cluster = 0;
 	unsigned long core = 0;
+	int has_arg0 = 0;
+	int has_arg1 = 0;
+	int has_arg2 = 0;
 	printk(DRIVER_NAME ": %s line='%s'\n", __func__, buf);
 	ac = strsplit(buf, av, avsz);
 	for (i=0; i<ac; i++) {
 		char* s = av[i];
 		if (!s) break;
 		printk(DRIVER_NAME ": %s av[%d]='%s'\n", __func__, i, s);
-		if (i==0) {
+		if (i==0) { // function
 			if (is0_9(*s)) {
-				cmd = (int)*s - (int)'0';
+				ret = kstrtoul(s, 0, &cmd);
+				printk(DRIVER_NAME ": %s cmd=%ld ret=%d\n", __func__, cmd, ret);
 			} else if ((strcasecmp(s, "version") == 0) || (strcasecmp(s, "ver") == 0)) {
 				cmd = PSCI_CMD_PSCI_VERSION;
-			} else if ((strcasecmp(s, "suspend") == 0) || (strcasecmp(s, "sus") == 0)) {
+			} else if ((strcasecmp(s, "cpu_suspend") == 0) || (strcasecmp(s, "suspend") == 0) || (strcasecmp(s, "sus") == 0)) {
 				cmd = PSCI_CMD_CPU_SUSPEND;
 			} else if ((strcasecmp(s, "cpu_off") == 0) || (strcasecmp(s, "off") == 0)) {
 				cmd = PSCI_CMD_CPU_OFF;
@@ -151,29 +155,44 @@ static int parse_line(char * buf, char* av[], int avsz) {
 				cmd = PSCI_CMD_SYSTEM_OFF;
 			} else if ((strcasecmp(s, "system_reset") == 0) || (strcasecmp(s, "sys_reset") == 0) || (strcasecmp(s, "reset") == 0)) {
 				cmd = PSCI_CMD_SYSTEM_RESET;
+			} else if (strcasecmp(s, "features") == 0) {
+				cmd = PSCI_FN_FEATURES;
+			} else if (strcasecmp(s, "system_suspend") == 0) {
+				cmd = PSCI_FN_SYSTEM_SUSPEND;
 			} else {
 				printk(DRIVER_NAME ": %s BAD argument[%d] '%s'\n", __func__, i, s);
 				return -1;
 			}
-		} else if (i==1) {
-			ret = kstrtoul(s, 0, &cluster);
+		} else if (strncmp(s, "cluster=", strlen("cluster=")) == 0) {
+			char *p = s + strlen("cluster=");
+			ret = kstrtoul(p, 0, &cluster);
 			printk(DRIVER_NAME ": %s cluster=%ld ret=%d\n", __func__, cluster, ret);
-		} else if (i==2) {
-			ret = kstrtoul(s, 0, &core);
-			printk(DRIVER_NAME ": %s core=%ld ret=%d\n", __func__, core, ret);
-		} else if (i==3) {
+			arg0 = ((cluster & 0xFF) << 8) | ((core & 0xFF) << 0);
+			has_arg0 = 1;
+		} else if (strncmp(s, "core=", strlen("core=")) == 0) {
+			char *p = s + strlen("core=");
+			ret = kstrtoul(p, 0, &cluster);
+			printk(DRIVER_NAME ": %s core=%ld ret=%d\n", __func__, cluster, ret);
+			arg0 = ((cluster & 0xFF) << 8) | ((core & 0xFF) << 0);
+			has_arg0 = 1;
+		} else if (has_arg0 == 0) {
+			ret = kstrtoul(s, 0, &arg0);
+			printk(DRIVER_NAME ": %s arg0=%ld ret=%d\n", __func__, arg0, ret);
+			has_arg0 = 1;
+		} else if (has_arg1 == 0) {
 			ret = kstrtoul(s, 0, &arg1);
 			printk(DRIVER_NAME ": %s arg1=%ld ret=%d\n", __func__, arg1, ret);
-		} else if (i==4) {
+			has_arg1 = 1;
+		} else if (has_arg2 == 0) {
 			ret = kstrtoul(s, 0, &arg2);
 			printk(DRIVER_NAME ": %s arg2=%ld ret=%d\n", __func__, arg2, ret);
+			has_arg2 = 1;
 		} else {
 			printk(DRIVER_NAME ": %s BAD argument[%d], index overflow.\n", __func__, i);
 			return -1;
 		}
 	}
 	psci_cmd = cmd;
-	arg0 = ((cluster & 0xFF) << 8) | ((core & 0xFF) << 0);
 	print_settings();
 	return ac;
 }
@@ -205,7 +224,7 @@ static ssize_t mod_proc_write(struct file *file, const char __user *buf, size_t 
 	if (ret != -1) {
 		psci_invoke();
 	}
-	printk(DRIVER_NAME ": %s '%s'\n", __func__, proc_linebuf);
+	// printk(DRIVER_NAME ": %s '%s'\n", __func__, proc_linebuf);
 	return count;
 }
 static struct file_operations mod_proc_fops = {
