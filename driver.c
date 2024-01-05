@@ -156,9 +156,9 @@ static int parse_line(char * buf, char* av[], int avsz) {
 			} else if ((strcasecmp(s, "system_reset") == 0) || (strcasecmp(s, "sys_reset") == 0) || (strcasecmp(s, "reset") == 0)) {
 				cmd = PSCI_CMD_SYSTEM_RESET;
 			} else if (strcasecmp(s, "features") == 0) {
-				cmd = PSCI_FN_FEATURES;
+				cmd = PSCI_CMD_FEATURES;
 			} else if (strcasecmp(s, "system_suspend") == 0) {
-				cmd = PSCI_FN_SYSTEM_SUSPEND;
+				cmd = PSCI_CMD_SYSTEM_SUSPEND;
 			} else {
 				printk(DRIVER_NAME ": %s BAD argument[%d] '%s'\n", __func__, i, s);
 				return -1;
