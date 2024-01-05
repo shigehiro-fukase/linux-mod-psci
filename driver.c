@@ -175,6 +175,11 @@ static int parse_line(char * buf, char* av[], int avsz) {
 			printk(DRIVER_NAME ": %s core=%ld ret=%d\n", __func__, cluster, ret);
 			arg0 = ((cluster & 0xFF) << 8) | ((core & 0xFF) << 0);
 			has_arg0 = 1;
+		} else if (strncmp(s, "address=", strlen("address=")) == 0) {
+			char *p = s + strlen("address=");
+			ret = kstrtoul(p, 0, &arg1);
+			printk(DRIVER_NAME ": %s core=%ld ret=%d\n", __func__, cluster, ret);
+			has_arg1 = 1;
 		} else if (has_arg0 == 0) {
 			ret = kstrtoul(s, 0, &arg0);
 			printk(DRIVER_NAME ": %s arg0=%ld ret=%d\n", __func__, arg0, ret);
