@@ -46,7 +46,7 @@ Or directly specify params.
 
 ```
 # echo "cpu_off 1 0 0x730000000" > /proc/psci
---> UNKNOWN
+--> Never return
 ```
 
 ```
