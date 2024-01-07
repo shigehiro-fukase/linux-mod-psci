@@ -172,8 +172,30 @@ static int parse_line(char * buf, char* av[], int avsz) {
 				cmd = PSCI_CMD_SYSTEM_RESET;
 			} else if (strcasecmp(s, "features") == 0) {
 				cmd = PSCI_CMD_FEATURES;
+			} else if (strcasecmp(s, "cpu_freeze") == 0) {
+				cmd = PSCI_CMD_CPU_FREEZE;
+			} else if (strcasecmp(s, "default_suspend") == 0) {
+				cmd = PSCI_CMD_DEFAULT_SUSPEND;
+			} else if (strcasecmp(s, "node_hw_state") == 0) {
+				cmd = PSCI_CMD_NODE_HW_STATE;
 			} else if (strcasecmp(s, "system_suspend") == 0) {
 				cmd = PSCI_CMD_SYSTEM_SUSPEND;
+			} else if (strcasecmp(s, "set_suspend_mode") == 0) {
+				cmd = PSCI_CMD_SET_SUSPEND_MODE;
+			} else if (strcasecmp(s, "stat_residency") == 0) {
+				cmd = PSCI_CMD_STAT_RESIDENCY;
+			} else if (strcasecmp(s, "stat_count") == 0) {
+				cmd = PSCI_CMD_STAT_COUNT;
+			} else if (strcasecmp(s, "system_reset2") == 0) {
+				cmd = PSCI_CMD_SYSTEM_RESET2;
+			} else if (strcasecmp(s, "mem_protect") == 0) {
+				cmd = PSCI_CMD_MEM_PROTECT;
+			} else if (strcasecmp(s, "mem_protect_check_range") == 0) {
+				cmd = PSCI_CMD_MEM_PROTECT_CHECK_RANGE;
+			} else if (strcasecmp(s, "clean_inv_memregion") == 0) {
+				cmd = PSCI_CMD_CLEAN_INV_MEMREGION;
+			} else if (strcasecmp(s, "clean_inv_memregion_attributes") == 0) {
+				cmd = PSCI_CMD_CLEAN_INV_MEMREGION_ATTRIBUTES;
 			} else {
 				printk(DRIVER_NAME ": %s BAD argument[%d] '%s'\n", __func__, i, s);
 				return -1;
