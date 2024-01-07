@@ -174,8 +174,8 @@ static int parse_line(char * buf, char* av[], int avsz) {
 				cmd = PSCI_CMD_FEATURES;
 			} else if (strcasecmp(s, "cpu_freeze") == 0) {
 				cmd = PSCI_CMD_CPU_FREEZE;
-			} else if (strcasecmp(s, "default_suspend") == 0) {
-				cmd = PSCI_CMD_DEFAULT_SUSPEND;
+			} else if (strcasecmp(s, "cpu_default_suspend") == 0) {
+				cmd = PSCI_CMD_CPU_DEFAULT_SUSPEND;
 			} else if (strcasecmp(s, "node_hw_state") == 0) {
 				cmd = PSCI_CMD_NODE_HW_STATE;
 			} else if (strcasecmp(s, "system_suspend") == 0) {
