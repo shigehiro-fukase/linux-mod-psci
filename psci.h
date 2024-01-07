@@ -66,6 +66,9 @@
 #define PSCI_RET_NOT_PRESENT			-7
 #define PSCI_RET_DISABLED			-8
 #define PSCI_RET_INVALID_ADDRESS		-9
+#define PSCI_RET_TIMEOUT			-10
+#define PSCI_RET_RATE_LIMITED			-11
+#define PSCI_RET_BUSY				-12
 
 static const unsigned long psci_function_id[] = {
 	PSCI_FN_PSCI_VERSION,
@@ -197,7 +200,8 @@ static inline unsigned long invoke_psci_fn(bool use_hvc, bool use_asm,
 }
 static inline void print_psci_retval(unsigned long retval) {
 	const char * s;
-	switch (retval) {
+	int32_t ecode = (int32_t)retval;
+	switch (ecode) {
 		case PSCI_RET_SUCCESS:          s = "PSCI_RET_SUCCESS";          break;
 		case PSCI_RET_NOT_SUPPORTED:    s = "PSCI_RET_NOT_SUPPORTED";    break;
 		case PSCI_RET_INVALID_PARAMS:   s = "PSCI_RET_INVALID_PARAMS";   break;
@@ -208,6 +212,9 @@ static inline void print_psci_retval(unsigned long retval) {
 		case PSCI_RET_NOT_PRESENT:      s = "PSCI_RET_NOT_PRESENT";      break;
 		case PSCI_RET_DISABLED:         s = "PSCI_RET_DISABLED";         break;
 		case PSCI_RET_INVALID_ADDRESS:  s = "PSCI_RET_INVALID_ADDRESS";  break;
+		case PSCI_RET_TIMEOUT:		s = "PSCI_RET_TIMEOUT";          break;
+		case PSCI_RET_RATE_LIMITED:	s = "PSCI_RET_RATE_LIMITED";     break;
+		case PSCI_RET_BUSY:		s = "PSCI_RET_BUSY";             break;
 		default: s = "UNKNOWN"; break;
 	}
 	printk(DRIVER_NAME ": retvalue 0x%lx \"%s\"\n", retval, s);
