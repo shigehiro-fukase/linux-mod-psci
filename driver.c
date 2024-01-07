@@ -283,7 +283,7 @@ static int __init mod_init(void) {
 
 	if (init_act) {
 		unsigned long psci_ret;
-		unsigned long function_id = psci_function_id[psci_cmd];
+		unsigned long function_id = psci_cmd2id(psci_cmd);
 
 		if (cpu) {
 			arg0 = cpu;
