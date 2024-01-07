@@ -202,19 +202,19 @@ static inline void print_psci_retval(unsigned long retval) {
 	const char * s;
 	int32_t ecode = (int32_t)retval;
 	switch (ecode) {
-		case PSCI_RET_SUCCESS:          s = "SUCCESS";          break;
-		case PSCI_RET_NOT_SUPPORTED:    s = "NOT_SUPPORTED";    break;
-		case PSCI_RET_INVALID_PARAMS:   s = "INVALID_PARAMS";   break;
-		case PSCI_RET_DENIED:           s = "DENIED";           break;
-		case PSCI_RET_ALREADY_ON:       s = "ALREADY_ON";       break;
-		case PSCI_RET_ON_PENDING:       s = "ON_PENDING";       break;
-		case PSCI_RET_INTERNAL_FAILURE: s = "INTERNAL_FAILURE"; break;
-		case PSCI_RET_NOT_PRESENT:      s = "NOT_PRESENT";      break;
-		case PSCI_RET_DISABLED:         s = "DISABLED";         break;
-		case PSCI_RET_INVALID_ADDRESS:  s = "INVALID_ADDRESS";  break;
-		case PSCI_RET_TIMEOUT:		s = "TIMEOUT";          break;
-		case PSCI_RET_RATE_LIMITED:	s = "RATE_LIMITED";     break;
-		case PSCI_RET_BUSY:		s = "BUSY";             break;
+		case PSCI_RET_SUCCESS:          s = "SUCCESS";			break;
+		case PSCI_RET_NOT_SUPPORTED:    s = "NOT_SUPPORTED";		break;
+		case PSCI_RET_INVALID_PARAMS:   s = "INVALID_PARAMETERS";	break;
+		case PSCI_RET_DENIED:           s = "DENIED";			break;
+		case PSCI_RET_ALREADY_ON:       s = "ALREADY_ON";		break;
+		case PSCI_RET_ON_PENDING:       s = "ON_PENDING";		break;
+		case PSCI_RET_INTERNAL_FAILURE: s = "INTERNAL_FAILURE";		break;
+		case PSCI_RET_NOT_PRESENT:      s = "NOT_PRESENT";		break;
+		case PSCI_RET_DISABLED:         s = "DISABLED";			break;
+		case PSCI_RET_INVALID_ADDRESS:  s = "INVALID_ADDRESS";		break;
+		case PSCI_RET_TIMEOUT:		s = "TIMEOUT";			break;
+		case PSCI_RET_RATE_LIMITED:	s = "RATE_LIMITED";		break;
+		case PSCI_RET_BUSY:		s = "BUSY";			break;
 		default: s = "UNKNOWN"; break;
 	}
 	printk(DRIVER_NAME ": retvalue 0x%lx \"%s\"\n", retval, s);
