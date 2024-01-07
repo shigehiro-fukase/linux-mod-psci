@@ -22,7 +22,7 @@
 #include <linux/ctype.h>
 #include <linux/string.h>
 #include <asm/uaccess.h>
-#include "../psci.h"
+#include "./psci.h"
 
 MODULE_LICENSE("Dual BSD/GPL");
 #ifndef DRIVER_NAME
