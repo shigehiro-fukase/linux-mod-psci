@@ -28,9 +28,12 @@ BOOTFILE	= $(LOOP64)
 
 # R-CarH3 test2
 BOOTADDR	= 0x730000000
-CLUSTER		= 1
-CORE		= 0
-TARGETCPU	= 0x100	# Clulster 1 Core 0
+CPU_CLUSTER	= 1	# Clulster 1
+CPU_CORE	= 0	# Core 0
+CPU		= 0x100	# Clulster 1 Core 0
+
+# TARGETCPU	= cpu=$(CPU)
+TARGETCPU	= cpu_cluster=$(CPU_CLUSTER) cpu_core=$(CPU_CORE)
 
 all:
 	$(MAKE) -C $(KERNEL_HEADERS) M=$(PWD) modules
@@ -48,6 +51,16 @@ rmmod:
 	@n=$(shell lsmod | grep $(obj-mm)|wc -l ); [ "$$n" -ne "0" ] && rmmod $(obj-mm)
 	#-lsmod | grep $(obj-mm)
 
+init_act: rmmod
+	#-modprobe $(obj-mm)
+	insmod $(obj-ko) use_hvc=N use_asm=N \
+		$(TARGETCPU) \
+		entrypoint=$(BOOTADDR) \
+		arg2=0 \
+		verbose=Y
+	sudo dmesg | tail
+	#grep "" -r /sys/module/$(obj-m:.o=)/parameters/
+
 reinsmod: rmmod
 	#-modprobe $(obj-mm)
 	insmod $(obj-ko)
@@ -60,12 +73,25 @@ insmod:
 	@n=$(shell lsmod | grep $(obj-mm)|wc -l ); \
 		[ "$$n" -eq "0" ] && insmod $(obj-ko) || lsmod | grep $(obj-mm)
 
-on: insmod
-	-echo on $(CLUSTER) $(CORE) $(BOOTADDR) > /proc/psciop
-
-off: insmod
-	-echo off $(CLUSTER) $(CORE) > /proc/psciop
-
 load:
 	@echo $(LDF) $(BOOTADDR) $(BOOTFILE)
+
+test:
+	@echo insmod $(obj-ko) use_hvc=N use_asm=N init_act=Y \
+		$(TARGETCPU) \
+		entrypoint=$(BOOTADDR) \
+		arg2=0 \
+		verbose=Y
+
+h3:
+	@echo $(LDF) $(BOOTADDR) $(BOOTFILE)
+	@echo $(LDKO) --init_module \
+		$(obj-ko) use_hvc=N use_asm=N init_act=Y \
+		$(TARGETCPU) \
+		entrypoint=$(BOOTADDR) \
+		arg2=0 \
+		verbose=Y
+
+on: insmod
+	-echo "cpu_on cluster=$(CPU_CLUSTER) core=$(CPU_CORE) address=$(BOOTADDR)" > /proc/psciop
 
