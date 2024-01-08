@@ -108,11 +108,7 @@ static int psci_invoke(void) {
 			function_id, arg0, arg1, arg2,
 			&res);
 
-	if (function_id == PSCI_FN_PSCI_VERSION) {
-		printk(DRIVER_NAME ": value 0x%lx\n", psci_ret);
-	} else {
-		print_psci_retval(psci_ret);
-	}
+	print_psci_retval(psci_ret);
 	print_psci_res(&res);
 	return psci_ret;
 }

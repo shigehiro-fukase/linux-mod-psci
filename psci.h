@@ -217,7 +217,11 @@ static inline void print_psci_retval(unsigned long retval) {
 		case PSCI_RET_BUSY:		s = "BUSY";			break;
 		default: s = "UNKNOWN"; break;
 	}
-	printk(DRIVER_NAME ": retvalue 0x%lx \"%s\"\n", retval, s);
+	if (ecode > 0) {
+		printk(DRIVER_NAME ": retvalue 0x%lx\n", retval);
+	} else {
+		printk(DRIVER_NAME ": retvalue 0x%lx \"%s\"\n", retval, s);
+	}
 }
 static inline void print_psci_res(struct arm_smccc_res *resp) {
 	if (!resp) return;
