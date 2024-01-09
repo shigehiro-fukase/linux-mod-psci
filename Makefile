@@ -38,6 +38,7 @@ TARGETCPU	= cpu_cluster=$(CPU_CLUSTER) cpu_core=$(CPU_CORE)
 all:
 	$(MAKE) -C $(KERNEL_HEADERS) M=$(PWD) modules
 	-modinfo ./*.ko
+	-file ./*.ko
 clean:
 	$(MAKE) -C $(KERNEL_HEADERS) M=$(PWD) clean
 
