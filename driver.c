@@ -199,14 +199,14 @@ static int parse_line(char * buf, char* av[], int avsz) {
 		} else if (strncmp(s, "cluster=", strlen("cluster=")) == 0) {
 			char *p = s + strlen("cluster=");
 			ret = kstrtoul(p, 0, &cluster);
-			// printk(DRIVER_NAME ": %s cluster=%ld ret=%d\n", __func__, cluster, ret);
+			printk(DRIVER_NAME ": %s cluster=%ld ret=%d arg0=0x%lX\n", __func__, cluster, ret, arg0);
 			arg0 = ((cluster & 0xFF) << 8) | ((core & 0xFF) << 0);
 			has_arg0 = 1;
 		} else if (strncmp(s, "core=", strlen("core=")) == 0) {
 			char *p = s + strlen("core=");
-			ret = kstrtoul(p, 0, &cluster);
-			// printk(DRIVER_NAME ": %s core=%ld ret=%d\n", __func__, cluster, ret);
+			ret = kstrtoul(p, 0, &core);
 			arg0 = ((cluster & 0xFF) << 8) | ((core & 0xFF) << 0);
+			printk(DRIVER_NAME ": %s core=%ld ret=%d arg0=0x%lX\n", __func__, core, ret, arg0);
 			has_arg0 = 1;
 		} else if (strncmp(s, "address=", strlen("address=")) == 0) {
 			char *p = s + strlen("address=");
