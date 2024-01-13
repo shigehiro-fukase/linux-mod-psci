@@ -1,17 +1,9 @@
+#include <linux/version.h>
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/types.h>
 #include <linux/kernel.h>
 #include <linux/fs.h>
-#if 0
-#include <linux/cdev.h>
-#include <linux/sched.h>
-#include <linux/device.h>
-#include <linux/gpio.h>
-#include <linux/interrupt.h>
-#include <linux/hrtimer.h>
-#include <linux/ktime.h>
-#endif
 #include <linux/arm-smccc.h>
 // #include <linux/uapi/linux/psci.h>
 #include <linux/psci.h>
@@ -31,6 +23,10 @@ MODULE_LICENSE("Dual BSD/GPL");
 #ifndef PROC_NAME
 #define PROC_NAME	"psci"		/* procfs name of /proc/ */
 #endif /* PROC_NAME */
+
+#define LINUX_VERSION_CODE_RELEASE	(((LINUX_VERSION_CODE)>>16)&0xff)
+#define LINUX_VERSION_CODE_MAJOR	(((LINUX_VERSION_CODE)>>8)&0xff)
+#define LINUX_VERSION_CODE_MINOR	(((LINUX_VERSION_CODE)>>0)&0xff)
 
 /* default value */
 
@@ -265,6 +261,7 @@ static ssize_t mod_proc_write(struct file *file, const char __user *buf, size_t 
 	// printk(DRIVER_NAME ": %s '%s'\n", __func__, proc_linebuf);
 	return count;
 }
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,0,0)
 static struct file_operations mod_proc_fops = {
 	.owner = THIS_MODULE,
 	.open = mod_proc_open,
@@ -272,6 +269,14 @@ static struct file_operations mod_proc_fops = {
 	.read = mod_proc_read,
 	.write = mod_proc_write,
 };
+#else
+static struct proc_ops mod_proc_fops = {
+	.proc_open = mod_proc_open,
+	.proc_release = mod_proc_close,
+	.proc_read = mod_proc_read,
+	.proc_write = mod_proc_write,
+};
+#endif
 
 /* At load (insmod) */
 static int __init mod_init(void) {
